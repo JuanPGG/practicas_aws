@@ -1,0 +1,27 @@
+{
+  "compilerOptions": {
+    "target": "es5",
+    "lib": ["dom", "dom.iterable", "esnext"],          
+    "jsx": "react-jsx",                   
+    "moduleResolution": "node",           
+    "strict": true,                        
+    "skipLibCheck": true,                  
+    "esModuleInterop": true,               
+    "allowSyntheticDefaultImports": true,  
+    "noImplicitAny": true,                 
+    "module": "esnext",                    
+    "resolveJsonModule": true,             
+    "skipDefaultLibCheck": true,           
+    "forceConsistentCasingInFileNames": true,
+    "baseUrl": ".",
+  },
+  "include": [
+    "**/*.ts", 
+    "**/*.tsx"                             
+  ],
+  "exclude": [
+    "node_modules",                        
+    "build",                               
+    "dist"                                 
+  ]
+}

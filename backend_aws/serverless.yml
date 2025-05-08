@@ -1,0 +1,112 @@
+# "org" ensures this Service is used with the correct Serverless Framework Access Key.
+org: capacitacion
+# "app" enables Serverless Framework Dashboard features and sharing them with other Services.
+app: backend-aws
+# "service" is the name of this project. This will also be added to your AWS resource names.
+service: backend-aws
+
+stages:
+  default:
+    params:
+      tableName: "users-table-${sls:stage}"
+
+provider:
+  name: aws
+  runtime: nodejs20.x
+  httpApi:
+    cors: true
+  iam:
+    role:
+      statements:
+        - Effect: Allow
+          Action:
+            - dynamodb:Query
+            - dynamodb:Scan
+            - dynamodb:GetItem
+            - dynamodb:PutItem
+            - dynamodb:UpdateItem
+            - dynamodb:DeleteItem
+            - sns:Publish
+          Resource:
+            - Fn::GetAtt: [UsersTable, Arn]
+            - arn:aws:sns:us-east-1:147997121225:userNotifications
+  environment:
+    USERS_TABLE: ${param:tableName}
+    URL_BASE_DATOS: ${ssm:/myapp/url_base_datos}
+    SNS_TOPIC_ARN: ${ssm:/myapp/sns_topic_arn}
+    ROL_IAM_AWS: ${ssm:/myapp/rol_iam_aws}
+    COGNITO_USER_POOL_ID: 'arn:aws:cognito-idp:us-east-1:147997121225:userpool/us-east-1_BunF09iaa'
+
+functions:
+  getUsers:
+    handler: handler.getUsers
+    events:
+      - httpApi:
+          path: /users
+          method: get
+          # cors: true
+          # authorizer:
+          #   arn: arn:aws:cognito-idp:us-east-1:147997121225:userpool/us-east-1_BunF09iaa
+          #   resultTtlInSeconds: 0
+          #   identitySource: method.request.header.Authorization
+
+  createUser:
+    handler: handler.createUser
+    events:
+      - httpApi:
+          path: /createUser
+          method: post
+          # cors: true
+          # authorizer:
+          #   arn: arn:aws:cognito-idp:us-east-1:147997121225:userpool/us-east-1_BunF09iaa
+          #   resultTtlInSeconds: 0
+          #   identitySource: method.request.header.Authorization
+
+  updateUser:
+    handler: handler.updateUser
+    events:
+      - httpApi:
+          path: /updateUser/{id}
+          method: put
+          # cors: true
+          # authorizer:
+          #   arn: arn:aws:cognito-idp:us-east-1:147997121225:userpool/us-east-1_BunF09iaa
+          #   resultTtlInSeconds: 0
+          #   identitySource: method.request.header.Authorization
+
+  deleteUser:
+    handler: handler.deleteUser
+    events:
+      - httpApi:
+          path: /deleteUser/{id}
+          method: delete
+          # cors: true
+          # authorizer:
+          #   arn: arn:aws:cognito-idp:us-east-1:147997121225:userpool/us-east-1_BunF09iaa
+          #   resultTtlInSeconds: 0
+          #   identitySource: method.request.header.Authorization
+
+  sendEmail:
+    handler: handler.sendEmail
+    events:
+      - httpApi:
+          path: /send-email
+          method: post
+          # authorizer:
+          #   arn: arn:aws:cognito-idp:us-east-1:147997121225:userpool/us-east-1_BunF09iaa
+          #   resultTtlInSeconds: 0
+          #   identitySource: method.request.header.Authorization
+
+resources:
+  Resources:
+    UsersTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        AttributeDefinitions:
+          - AttributeName: userId
+            AttributeType: S
+        KeySchema:
+          - AttributeName: userId
+            KeyType: HASH
+        BillingMode: PAY_PER_REQUEST
+        TableName: ${param:tableName}

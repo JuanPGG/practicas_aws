@@ -1,0 +1,7 @@
+{
+    "AppSyncApiName": "frontendaws",
+    "DynamoDBBillingMode": "PAY_PER_REQUEST",
+    "DynamoDBEnableServerSideEncryption": false,
+    "S3DeploymentBucket": "amplify-frontendaws-dev-6791e-deployment",
+    "S3DeploymentRootKey": "amplify-appsync-files/b977c6de3a58f80b4220e4996878d7f722ebf2d6"
+}
